@@ -13,6 +13,15 @@ public class UserRequest {
     private String password;
     @DateTimeFormat(pattern = "yyyy-mm-dd")
     private Date dateNaissance;
+    private Roles roles = Roles.Client;
+
+    public Roles getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Roles roles) {
+        this.roles = roles;
+    }
 
     public String getFirstName() {
         return firstName;

@@ -40,9 +40,10 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers(){
+    public ResponseEntity<List<UserResponse>> getAllUsers(@RequestParam(value = "page", defaultValue = "1") int p,
+                                                          @RequestParam(value = "limit", defaultValue = "5") int l){
         List<UserResponse> userResponses = new ArrayList<>();
-        List<UserEntity> userEntity = userService.getAllUsers();
+        List<UserEntity> userEntity = userService.getAllUsers(p,l);
         for (UserEntity row : userEntity) {
             UserResponse userResponse = modelMapper.map(row, UserResponse.class);
             userResponses.add(userResponse);
@@ -54,5 +55,13 @@ public class UserController {
     public ResponseEntity deleteUser(@PathVariable("id") long id){
         userService.deleteUser(id);
         return new ResponseEntity(null, HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponse> editUser(@PathVariable("id") long id, @RequestBody UserRequest userRequest){
+        UserEntity user = modelMapper.map(userRequest, UserEntity.class);
+        UserEntity userEntity = userService.editUser(id, user);
+        UserResponse userResponse = modelMapper.map(userEntity, UserResponse.class);
+        return new ResponseEntity<UserResponse>(userResponse, HttpStatus.OK);
     }
 }

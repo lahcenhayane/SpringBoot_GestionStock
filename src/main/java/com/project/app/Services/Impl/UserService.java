@@ -2,8 +2,12 @@ package com.project.app.Services.Impl;
 
 import com.project.app.Entities.UserEntity;
 import com.project.app.Repositories.UserRepository;
+import com.project.app.Requests.UserRequest;
 import com.project.app.Services.IUserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,9 +43,16 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public List<UserEntity> getAllUsers() {
-        List<UserEntity> userEntity = userRepository.findAll();
-        return userEntity;
+    public List<UserEntity> getAllUsers(int p, int l) {
+        p--;
+        if (p < 0) p = 0;
+        ModelMapper modelMapper = new ModelMapper();
+        List<UserEntity> users = new ArrayList<>();
+        Page<UserEntity> page = userRepository.findAll(PageRequest.of(p,l));
+        for (UserEntity row: page.getContent()) {
+            users.add(modelMapper.map(row, UserEntity.class));
+        }
+        return users;
     }
 
     @Override
@@ -56,5 +67,16 @@ public class UserService implements IUserService {
         UserEntity userEntity = getUser(id);
         if (userEntity == null)throw new RuntimeException("This User Not Found.");
         userRepository.delete(userEntity);
+    }
+
+    @Override
+    public UserEntity editUser(long id, UserEntity user) {
+        UserEntity userEntity = getUser(id);
+        userEntity.setFirstName(user.getFirstName());
+        userEntity.setLastName(user.getLastName());
+        userEntity.setEmail(user.getEmail());
+        userEntity.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        userEntity.setDateNaissance(user.getDateNaissance());
+        return userRepository.save(userEntity);
     }
 }

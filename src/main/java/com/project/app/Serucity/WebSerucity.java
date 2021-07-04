@@ -3,6 +3,7 @@ package com.project.app.Serucity;
 import com.project.app.Services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,9 +27,11 @@ public class WebSerucity extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
             .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/user/register").permitAll()
+                .antMatchers(HttpMethod.POST, "/user").permitAll()
             .anyRequest().authenticated()
             .and()
-            .addFilter(new AuthenticationFilter(authenticationManager()));
+            .addFilter(new AuthenticationFilter(authenticationManager()))
+            .addFilter(new AuthorizationFilter(authenticationManager()));
     }
+
 }

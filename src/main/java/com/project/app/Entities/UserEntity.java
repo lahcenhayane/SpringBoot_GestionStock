@@ -3,10 +3,7 @@ package com.project.app.Entities;
 import com.project.app.Enums.Roles;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity(name = "users")
@@ -20,6 +17,7 @@ public class UserEntity {
     private String password;
     @DateTimeFormat(pattern = "yyyy-mm-dd")
     private Date dateNaissance;
+    @Enumerated(EnumType.STRING)
     private Roles role = Roles.Client;
     private Date create_at = new Date();
 

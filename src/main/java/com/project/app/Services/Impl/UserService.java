@@ -4,6 +4,7 @@ import com.project.app.Entities.UserEntity;
 import com.project.app.Repositories.UserRepository;
 import com.project.app.Services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserService implements IUserService {
@@ -32,6 +34,27 @@ public class UserService implements IUserService {
         UserEntity user = userRepository.findByEmail(userEntity.getEmail());
         if (user != null) throw new RuntimeException("This Email Already Exist "+user.getEmail());
         userEntity.setPassword(bCryptPasswordEncoder.encode(userEntity.getPassword()));
+
         return userRepository.save(userEntity);
+    }
+
+    @Override
+    public List<UserEntity> getAllUsers() {
+        List<UserEntity> userEntity = userRepository.findAll();
+        return userEntity;
+    }
+
+    @Override
+    public UserEntity getUser(long id) {
+        UserEntity userEntity = userRepository.findById(id).get();
+        if (userEntity == null) throw new RuntimeException("This User Not Found.");
+        return userEntity;
+    }
+
+    @Override
+    public void deleteUser(long id) {
+        UserEntity userEntity = getUser(id);
+        if (userEntity == null)throw new RuntimeException("This User Not Found.");
+        userRepository.delete(userEntity);
     }
 }

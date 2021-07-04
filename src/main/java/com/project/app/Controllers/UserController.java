@@ -8,24 +8,51 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.websocket.server.PathParam;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
+    private ModelMapper modelMapper = new ModelMapper();
+
     @Autowired
     IUserService userService;
 
-    @PostMapping("/register")
+    @PostMapping
     public ResponseEntity<UserResponse> CreateNewUser(@RequestBody UserRequest userRequest){
-        ModelMapper modelMapper = new ModelMapper();
         UserEntity userEntity = modelMapper.map(userRequest, UserEntity.class);
         UserEntity user = userService.createUser(userEntity);
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
         return new ResponseEntity<UserResponse>(userResponse, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getUser(@PathVariable("id") long id){
+        UserEntity userEntity = userService.getUser(id);
+        UserResponse userResponse = modelMapper.map(userEntity, UserResponse.class);
+        return new ResponseEntity<>(userResponse, HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getAllUsers(){
+        List<UserResponse> userResponses = new ArrayList<>();
+        List<UserEntity> userEntity = userService.getAllUsers();
+        for (UserEntity row : userEntity) {
+            UserResponse userResponse = modelMapper.map(row, UserResponse.class);
+            userResponses.add(userResponse);
+        }
+        return new ResponseEntity<List<UserResponse>>(userResponses, HttpStatus.ACCEPTED);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity deleteUser(@PathVariable("id") long id){
+        userService.deleteUser(id);
+        return new ResponseEntity(null, HttpStatus.NO_CONTENT);
     }
 }

@@ -27,6 +27,8 @@ public class WebSerucity extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable()
             .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/user/register").permitAll()
-            .anyRequest().authenticated();
+            .anyRequest().authenticated()
+            .and()
+            .addFilter(new AuthenticationFilter(authenticationManager()));
     }
 }
